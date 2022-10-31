@@ -1,0 +1,64 @@
+"devDependencies": {
+   "@types/jest": "^26.0.20",
+  "jest": "^26.6.3",   
+ "jest-playwright-preset": "^1.4.5",  
+  "playwright": "^1.8.0",   
+ "typescript": "^4.1.3" ,
+"ts-jest": "^26.5.0"},
+
+
+"jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+  "scripts": {
+    "test": "jest"
+  },
+
+screen record test on HCM > statutory forms > malaysiaEPF
+
+import { test, expect } from '@playwright/test';
+test('test', async ({ page }) => {
+  await page.goto('http://localhost:8080/login');
+  await page.locator('input[name="username"]').click();
+  await page.locator('input[name="username"]').fill('su');
+  await page.locator('input[name="username"]').press('Tab');
+  await page.locator('input[name="password"]').fill('su');
+  await page.locator('input[name="password"]').press('Tab');
+  await page.locator('span:has-text("p-emptylabelCompany") div').first().click();
+  await page.getByText('Validatiions Testing').first().click();
+  await page.getByRole('button', { name: 'Sign in Now' }).click();
+  await expect(page).toHaveURL('http://localhost:8080/home');
+  await page.locator('#mnuStatutoryForms > .p-card > .p-card-header').click();
+  await expect(page).toHaveURL('http://localhost:8080/submenu/mnuStatutoryForms');
+  await page.getByRole('button', { name: '' }).click();
+  await page.getByRole('option', { name: 'Malaysia' }).click();
+  await page.getByRole('tabpanel').locator('[id="\\39 389"]').getByText('EPF').click();
+  await expect(page).toHaveURL('http://localhost:8080/mainView/9389');
+  await page.getByRole('button', { name: ' MalaysiaEPF' }).click();
+  await page.getByRole('button', { name: '' }).nth(1).click();
+  await page.getByRole('option', { name: 'C' }).click();
+  await page.getByRole('button', { name: '' }).nth(2).click();
+  await page.getByRole('option', { name: '2016' }).click();
+  await page.locator('div:nth-child(3) > .p-inputnumber > .p-inputtext').click();
+  await page.locator('div:nth-child(4) > .p-inputnumber > .p-inputtext').click();
+  await page.locator('div:nth-child(5) > .p-inputnumber > .p-inputtext').click();
+  await page.locator('div:nth-child(6) > .p-inputnumber > .p-inputtext').click();
+  await page.getByRole('button', { name: '+' }).click();
+  await page.locator('div:nth-child(2) > .p-datatable-wrapper > .p-datatable-table > .p-datatable-tbody > tr > td').first().click();
+  await page.getByRole('button', { name: ' Save' }).click();
+  await page.getByRole('button', { name: '' }).click();
+  await page.locator('i:nth-child(5)').click();
+  await page.getByRole('button', { name: ' Logout' }).click();
+  await expect(page).toHaveURL('http://localhost:8080/login');
+});
+
