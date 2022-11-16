@@ -1,0 +1,232 @@
+
+<template>
+    <Toast />
+    <ConfirmDialog group="geoFencingDialog" />
+    <ActionBar Header="true" v-if="generalRibbonModel" @action-handler="actionBarEvent"
+        :DataSource="generalRibbonModel"></ActionBar>
+    <TabView>
+        <TabPanel header="General">
+            <span class="p-fluid p-formgrid p-grid layoutGrid">
+                <div class="p-col-5 p-field p-col p-float-label">
+                    <InputText type="text" id="name" v-model="name" />
+                    <field-label>Name</field-label>
+                </div>
+                <div class="p-col-5 p-field p-col p-float-label">
+                    <Calendar id="calendar" v-model="selectcalender" :showIcon="true" />
+                    <field-label>Date</field-label>
+                </div>
+                <div class="p-col-5 p-field p-col p-float-label">
+                    <Dropdown v-model="selectdesignation" :options="designation" optionLable="designation"
+                        :editable="true" class="p-invalid" />
+                    <field-label>Designation</field-label>
+                </div>
+
+                <div class="p-col-5 p-field p-col p-float-label">
+                    <Textarea v-model="remark" rows="1" cols="20" />
+                    <field-label>Remark</field-label>
+                </div>
+                <div class="p-col-5 p-field p-col p-float-label">
+                    <InputNumber id="locale-user" v-model="latitude" mode="decimal" :maxFractionDigits="7" />
+                    <field-label>Latitude</field-label>
+                </div>
+                <div class="p-col-5 p-field p-col p-float-label">
+
+                    <InputNumber id="locale-user" v-model="longitude" mode="decimal" :maxFractionDigits="7" />
+                    <field-label>Longitude</field-label>
+                </div>
+                <div class="p-col-5 p-field p-col p-float-label">
+
+                    <InputNumber id="locale-user" v-model="radius" />
+                    <field-label>Radius(in Meters)</field-label>
+                </div>
+                <div class="p-col-5 p-field p-col p-float-label">
+                    <Button label="Refresh" @click="refreshPage" />
+                </div>
+
+                <div id="mapContainer"></div>
+
+            </span>
+        </TabPanel>
+    </TabView>
+</template>
+
+<script setup>
+import InputText from 'primevue/inputtext';
+import Calendar from 'primevue/calendar';
+import Dropdown from 'primevue/dropdown';
+import Textarea from 'primevue/textarea';
+import InputNumber from 'primevue/inputnumber';
+import Button from 'primevue/button';
+import Panel from 'primevue/panel';
+import FieldLabel from "@/pages/FormTemplate/FieldLabel.vue";
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import { useToast } from "primevue/usetoast";
+import { useConfirm } from "primevue/useconfirm";
+import ActionBar from "@/pages/FormTemplate/ActionBar.vue";
+
+import { onMounted, ref, defineProps } from 'vue';
+import GeoFencingService from '../../services/GeoFencingService';
+import DateTimeService from '../../services/DateTimeService';
+
+const props = defineProps({
+    recordId: {
+        type: Number,
+        required: true
+    },
+    screenId: {
+        type: Number,
+        required: true
+    },
+});
+
+const toast = useToast();
+const confirm = useConfirm();
+const zoom = ref(14);
+const iconWidth = ref(25);
+const iconHeight = ref(40);
+const name = ref();
+const selectcalender = ref();
+const designation = ref([
+    { name: 'Pm', id: '1' },
+    { name: 'Senior Test Engineer', id: '2' },
+    { name: 'Tester', id: '3' },
+    { name: 'TL', id: '4' },
+]);
+const remark = ref();
+const latitude = ref(17.42071520588518);
+const longitude = ref(78.4566255733458);
+const radius = ref(100);
+const iconUrl = ref();
+const map = ref();
+const generalRibbonModel = ref([]);
+onMounted(() => {
+    getData();
+});
+
+function getData() {
+    GeoFencingService.GetGeoFencingEV(props.screenId, props.recordId).then((response) => {
+        // Model.value = response.data;
+        name.value = response.data.geoFencingView.sName;
+        selectcalender.value = DateTimeService.IntToDate(response.data.geoFencingView.dDate);
+        designation.value = response.data.geoFencingView.iApplicablefor;
+        remark.value = response.data.geoFencingView.sRemarks;
+        if (response.data.geoFencingView.fLatitude > 0 && response.data.geoFencingView.fLongitude > 0) {
+            latitude.value = response.data.geoFencingView.fLatitude;
+            longitude.value = response.data.geoFencingView.fLongitude;
+        }
+        radius.value = response.data.geoFencingView.fRadius;
+        generalRibbonModel.value = response.data.generalRibbonModel;
+        //mapInitialize();
+    })
+}
+
+function postData() {
+
+}
+
+function deleteData() {
+    confirm.require({
+        message: "Are you sure you want to delete?",
+        group: "geoFencingDialog",
+        icon: "pi pi-info-circle",
+        acceptClass: "p-button-danger",
+        accept: () => {
+            if (
+                props.recordId != 0 &&
+                props.recordId != null &&
+                props.recordId != undefined
+            ) {
+                GeoFencingService.DeleteGeoFencing(props.screenId, props.recordId).then(
+                    (response) => {
+                        toast.add({
+                            severity: "info",
+                            summary: response.data.Message,
+                            life: 3000,
+                        });
+                    },
+                    // emit("MainviewRefresh"),
+                    // clearFields()
+                );
+            } else {
+                toast.add({
+                    severity: "error",
+                    summary: "Select GeoFencing to Delete",
+                    life: 3000,
+                });
+            }
+        },
+        reject: () => { },
+    });
+}
+
+// function mapInitialize() {
+//     map.value = L.map("mapContainer").setView([latitude.value, longitude.value], 15);
+//     L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+//         attribution:
+//             '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+//     }).addTo(map.value);
+
+//     var customPane = map.value.createPane("customPane");
+//     var canvasRenderer = L.canvas({ pane: "customPane" });
+//     var myIcon = L.icon({
+//         iconUrl: 'https://cdn-icons-png.flaticon.com/512/2642/2642502.png',
+//         iconSize: [40, 40],
+//     });
+//     customPane.style.zIndex = 399;
+//     L.marker([latitude.value, longitude.value], { icon: myIcon }).addTo(map.value);
+
+//     var drawnItems = new L.FeatureGroup();
+//     map.value.addLayer(drawnItems);
+//     var drawControl = new L.Control.Draw({
+//         position: "topright",
+//         draw: {
+//             polygon: false,
+//             marker: false,
+//             polyline: false,
+//             rectangle: false,
+//             circlemarker: false,
+//         },
+//         edit: {
+//             featureGroup: drawnItems,
+//             edit: true
+//         }
+//     });
+//     map.value.addControl(drawControl);
+
+//     // new L.Toolbar2.DrawToolbar({
+//     //     position: "topright",
+//     //         polyline: false,
+//     //         polygon: false,
+//     //         circlemarker: false,
+//     //         circle: true,
+//     //       showRadius: true,
+//     // }).addTo(map.value);
+// }
+// function getcoordinatescircle() {
+//     map.value.on('click', function (ev) {
+//         var latlng = map.value.mouseEventToLatLng(ev.originalEvent);
+//         console.log(latlng.lat + ', ' + latlng.lng);
+//     });
+// }
+
+const actionBarEvent = function (Actionobj) {
+    let name = Actionobj.name;
+    switch (name) {
+        case "Save":
+            // Post();
+            break;
+        case "Delete":
+            deleteData();
+            break;
+    }
+};
+
+</script>
+
+<style scoped lang="scss">
+#mapContainer {
+    height: 60vh;
+    width: 60vw;
+}
+</style>
