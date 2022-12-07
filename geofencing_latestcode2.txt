@@ -1,0 +1,339 @@
+<template>
+  <Toast />
+  <ConfirmDialog group="geoFencingDialog" />
+  <ActionBar Header="true" v-if="generalRibbonModel" @action-handler="actionBarEvent" :DataSource="generalRibbonModel">
+  </ActionBar>
+  <Accordion :activeIndex="0" v-if="geofencingView">
+    <AccordionTab header="General">
+      <div class="p-fluid p-formgrid p-grid layoutGrid">
+        <div class="p-col-5 p-field p-col p-float-label" style="margin-top:1rem">
+          <InputText type="text" v-model="geofencingView.sName" class="p-invalid" />
+          <field-label>Name*</field-label>
+          <p v-if="v$.geofencingView.sName.$error" class="p-error">Field is required</p>
+        </div>
+        <div class="p-col-5 p-field p-col p-float-label" style="margin-top:1rem">
+          <Calendar v-model="date" :showIcon="true" />
+          <field-label>Date</field-label>
+        </div>
+        <div class="p-col-5 p-field p-col p-float-label" v-if="iMasterId > 0">
+          <AutoComplete class="custAutoComplete" v-model="geofencingView.iTagId" :suggestions="ComboData"
+            @complete="GetComboData(iMasterId, $event)" :dropdown="true" field="Value" forceSelection></AutoComplete>
+          <field-label>{{ MasterName }} *</field-label>
+          <p v-if="v$.geofencingView.iTagId.$error" class="p-error">
+            Field is required
+          </p>
+        </div>
+        <div class="p-col-5 p-field p-col p-float-label">
+          <Textarea v-model="geofencingView.sRemarks" rows="1" cols="20" />
+          <field-label>Remark</field-label>
+        </div>
+      </div>
+      <div class="p-fluid p-formgrid p-grid layoutGrid">
+        <div class="p-col-5 p-field p-col p-float-label">
+          <InputNumber id="fLatitude" v-model="geofencingView.fLatitude" mode="decimal" :maxFractionDigits="14" />
+          <field-label>Latitude</field-label>
+        </div>
+        <div class="p-col-5 p-field p-col p-float-label">
+          <InputNumber id="fLongitude" v-model="geofencingView.fLongitude" mode="decimal" :maxFractionDigits="14" />
+          <field-label>Longitude</field-label>
+        </div>
+        <div class="p-col-5 p-field p-col p-float-label">
+          <InputNumber v-model="geofencingView.fRadius" id="fRadius" mode="decimal" :min="1" :maxFractionDigits="14" />
+          <field-label>Radius(in Meters)</field-label>
+        </div>
+        <div class="p-col-5 p-field p-col p-float-label">
+          <Button label="Refresh" @click="refreshPage" />
+        </div>
+      </div>
+    </AccordionTab>
+  </Accordion>
+  <div class="well">
+    <div id="mapContainer" style="height:44vh; width:49vw"></div>
+  </div>
+</template>
+
+<script setup>
+import { ref, defineProps, onMounted, computed, defineEmits } from "vue";
+import InputText from "primevue/inputtext";
+import Calendar from "primevue/calendar";
+import AutoComplete from "primevue/autocomplete";
+import Textarea from "primevue/textarea";
+import InputNumber from "primevue/inputnumber";
+import Button from "primevue/button";
+import Panel from "primevue/panel";
+import FieldLabel from "@/pages/FormTemplate/FieldLabel.vue";
+import Accordion from "primevue/accordion";
+import AccordionTab from "primevue/accordiontab";
+import { useConfirm } from "primevue/useconfirm";
+import ActionBar from "@/pages/FormTemplate/ActionBar.vue";
+import GeoFencingService from "@/services/GeoFencingService";
+import DateTimeService from "@/services/DateTimeService";
+import storeHelper from "@/services/StoreHelper";
+import { info, error, Success } from "@/services/ToastService.js";
+import useVuelidate from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
+import MenuService from "@/services/MenuService";
+//map start
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import "leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-toolbar/dist/leaflet.toolbar.css";
+import "leaflet-draw/dist/leaflet.draw-src.js";
+import "leaflet-toolbar";
+import "leaflet-draw-toolbar/dist/leaflet.draw-toolbar.js";
+//map end
+const emits = defineEmits(["Mainview-Refresh"]);
+const props = defineProps({
+  recordId: {
+    type: Number,
+    required: true,
+  },
+  screenId: {
+    type: Number,
+    required: true,
+  },
+});
+const IsLoading = ref(
+  computed({
+    get() {
+      return storeHelper.getBusy();
+    },
+    set(val) {
+      return storeHelper.setBusy(val);
+    },
+  })
+);
+
+const fLatitude = ref(17.420818490180537);
+const fLongitude = ref(78.45656633377077);
+const fRadius = ref(100);
+const confirm = useConfirm();
+const date = ref();
+const MasterName = ref("");
+const generalRibbonModel = ref();
+const geofencingView = ref({});
+const iMasterId = ref(0);
+const ComboData = ref([]);
+const map = ref();
+
+const rules = computed(() => {
+  return {
+    geofencingView: {
+      sName: {
+        required,
+      },
+      iTagId: {
+        required,
+      },
+    },
+  };
+});
+
+const v$ = useVuelidate(
+  rules,
+  {
+    geofencingView,
+  },
+  {
+    $lazy: true,
+    $autoDirty: true,
+  }
+);
+const actionBarEvent = function (Actionobj) {
+  let name = Actionobj.name;
+  switch (name) {
+    case "Save":
+      IsValid();
+      break;
+    case "Delete":
+      deleteData();
+      break;
+  }
+};
+onMounted(() => {
+  getData(props.screenId, props.recordId);
+});
+const getData = function (screenId, recordId) {
+  GeoFencingService.getData(screenId, recordId).then((res) => {
+    geofencingView.value = res.data.geoFencingView;
+    generalRibbonModel.value = res.data.generalRibbonModel;
+    date.value = DateTimeService.IntToDate(res.data.geoFencingView.dDate);
+    if(props.recordId == 0){
+      geofencingView.value.fLatitude = 17.420818490180537;
+      geofencingView.value.fLongitude = 78.45656633377077;
+  
+    }
+    mapInitialize();
+    refreshPage();
+
+    if (geofencingView.value.sTagId != null && geofencingView.value.sTagId.indexOf("|") != -1) {
+      geofencingView.value.iTagId = { sID: geofencingView.value.sTagId.split("|")[1], Value: geofencingView.value.sTagId.split("|")[0] }
+    }
+    if (
+      res.data.geoFencingView.sApplicablefor != null &&
+      res.data.geoFencingView.sApplicablefor.indexOf("|") != -1
+    ) {
+      MasterName.value = res.data.geoFencingView.sApplicablefor.split("|")[0];
+      iMasterId.value = Number(res.data.geoFencingView.sApplicablefor.split("|")[1]);
+      geofencingView.value.iApplicablefor = Number(res.data.geoFencingView.sApplicablefor.split("|")[1]);
+    }
+  });
+};
+
+const PostData = function () {
+  IsLoading.value = true;
+  if (geofencingView.value.iTagId != null) {
+    geofencingView.value.iTagId = Number(geofencingView.value.iTagId.sID);
+  }
+  geofencingView.value.dDate = DateTimeService.DateToInt(date.value);
+  GeoFencingService.PostData(geofencingView.value).then((res) => {
+    if (res.data.count == 0) {
+      Success("Success", "Record save successfully");
+      emits("Mainview-Refresh");
+      getData(9416, 0);
+    } else {
+      error("error", res.data.Message);
+    }
+    IsLoading.value = false;
+  });
+};
+const IsValid = function () {
+  let RetObj = true;
+  v$.value.$validate();
+  if (
+    geofencingView.value.sName == undefined ||
+    geofencingView.value.sName == null
+  ) {
+    RetObj = false;
+  }
+  if (
+    geofencingView.value.iTagId == undefined ||
+    geofencingView.value.iTagId == null
+  ) {
+    RetObj = false;
+  }
+  if (RetObj == true) {
+    PostData();
+    v$.value.$reset();
+  }
+};
+
+function deleteData() {
+  confirm.require({
+    message: "Are you sure you want to Delete?",
+    group: "geoFencingDialog",
+    icon: "pi pi-info-circle",
+    acceptClass: "p-button-danger p-button-outlined",
+    accept: () => {
+      if (props.recordId != 0 && props.recordId != null && props.recordId != undefined) {
+        GeoFencingService.delete(props.screenId, props.recordId).then((response) => {
+          if (response.data.count == 0) {
+            Success("Success", response.data.Message);
+            emits("Mainview-Refresh");
+            getData(9416, 0);
+          } else {
+            error("error", response.data.Message);
+          }
+        });
+      }
+    },
+    reject: () => { },
+  });
+}
+const GetComboData = function (MaterId, event) {
+  let sCondition = "";
+  let SearchKey = "";
+  if (event.query != undefined && event.query != null) SearchKey = event.query;
+  let params = [];
+  MenuService.getComboData(MaterId, SearchKey, sCondition, JSON.stringify(params)).then(
+    (response) => {
+      ComboData.value = response.data;
+    }
+  );
+};
+
+function mapInitialize() {
+  map.value = L.map("mapContainer").setView([fLatitude.value, fLongitude.value, fRadius.value], 16);
+  L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map.value);
+  var editableLayers = new L.FeatureGroup();
+map.value.addLayer(editableLayers);
+  var customPane = map.value.createPane("customPane");
+  var canvasRenderer = L.canvas({ pane: "customPane" });
+  var myIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2642/2642502.png',
+    iconSize: [40, 40]
+  });
+  customPane.style.zIndex = 399;
+  L.marker([fLatitude.value, fLongitude.value, fRadius.value], { icon: myIcon }).addTo(map.value)
+  var drawControl = new L.Control.Draw({
+    position: "topright",
+    draw: {
+      polygon: false,
+      marker: false,
+      polyline: false,
+      rectangle: false,
+      circlemarker: false,
+    },
+    edit: {
+      featureGroup: editableLayers,
+      edit: true,
+      remove: true
+
+    }
+  });
+  map.value.addControl(drawControl);
+  map.value.on(L.Draw.Event.CREATED, function (e) {
+    var type = e.layerType,
+      layer = e.layer;
+    map.value.addLayer(layer);
+    if (type === "circle") {
+      geofencingView.value.fRadius = Math.floor(layer._mRadius);
+      geofencingView.value.fLatitude = layer._latlng.lat;
+      geofencingView.value.fLongitude = layer._latlng.lng;
+    }
+    editableLayers.addLayer(layer);
+  });
+}
+// function getcoordinatescircle() {
+//   map.value.on('click', function (ev) {
+//     var latlng = map.value.mouseEventToLatLng(ev.originalEvent);
+//     console.log(latlng.lat + ', ' + latlng.lng);
+//   });
+
+// }
+
+const refreshPage = function () {
+  // geofencingView.value.fLatitude = null;
+  // geofencingView.value.fLongitude = null;
+  // geofencingView.value.fRadius = null;
+  // fLatitude.value = null;
+  // fLongitude.value = null;
+  // fRadius.value = null;
+  // if (map.value && map.value.remove) {
+  //   map.value.remove();
+  // }
+  // map.value.remove();
+  let myIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2642/2642502.png',
+    iconSize: [40, 40]
+  });
+ L.marker([geofencingView.value.fLatitude, geofencingView.value.fLongitude, geofencingView.value.fRadius], { icon: myIcon }).addTo(map.value)
+  map.value.setView([geofencingView.value.fLatitude, geofencingView.value.fLongitude, geofencingView.value.fRadius], 15)
+  let _latlng = { lat: "", lng: "" };
+  _latlng.lat = geofencingView.value.fLatitude;
+  _latlng.lng = geofencingView.value.fLongitude;
+  L.circle(_latlng, geofencingView.value.fRadius).addTo(map.value)
+  mapInitialize();
+}
+
+</script>
+
+<style scoped lang="scss">
+
+:deep(.p-accordion-header-text) {
+  font-size: medium;
+}
+</style>
