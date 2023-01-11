@@ -14,3 +14,5 @@ https://crm.centrahub.com/streamline/crmhome.do
 
 centrahub ess login details
 http://43.242.37.128/Focus.Web.Focus8/
+
+<TabPanel v-for="(tab,i) of Model.goalSheetHeaderList.length" :key="i" :header="Model.goalSheetHeaderList[i].sPeriod" >
