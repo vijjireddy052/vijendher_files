@@ -15,4 +15,14 @@ https://crm.centrahub.com/streamline/crmhome.do
 centrahub ess login details
 http://43.242.37.128/Focus.Web.Focus8/
 
-<TabPanel v-for="(tab,i) of Model.goalSheetHeaderList.length" :key="i" :header="Model.goalSheetHeaderList[i].sPeriod" >
+git cloning URL for HCM project
+git clone -b development --single-branch http://192.168.2.6/Bonobo.Git.Server/HCM.git
+
+
+Building progressive web application in vue to create a demo
+https://blog.logrocket.com/building-pwa-vue/
+
+Json file sorting accending/deccending order
+https://jsonsort.net/
+
+MenuController.cs file is to set Exclude screens in Release mode
