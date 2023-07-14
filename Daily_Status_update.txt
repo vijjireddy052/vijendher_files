@@ -1,0 +1,28 @@
+Implimenting Appraisal Hike Matrix screen
+-UI completed and data is getting in edit mode 
+-Need to complete save & delete and customization settings
+
+-code changes in Appraisal Hike Matrix screen for save and delete
+-code changes in Appraisal Hike Matrix controller 
+
+- Code changes in Appraisal Hike Matrix screen
+- Facing issue while posting data 
+- Need to implement customization screen of Appraisal Hike Matrix 
+
+- code changes in appraisal hike matrix screen for customization settings screen 
+- code changes in appraisal hike matrix controller for get and post methods to support vue
+
+ Code changes in appraisal hike matrix vue file for fields restriction andsaving issue 
+- Unit testing on single employee payroll bulk delete issue and solved
+
+ Code Changes In Appraisal Hike Matrix Settings Screen 
+- Code Changes In Report Filter For Employee Master Payslip and Email Screen Radio Button And Autocomplete Issue
+
+- Dropdown list option is not visible and radiobutton is not highlighting in employee master > payslip option issue resolved
+- code changes in announcement screen for document open in another window
+- code changes in appraisal hike matrix screen customization data table issue
+
+- code changes in announcememt screen for right click save as option disabled
+- code changes in messageboard screen for ms-excel files and doc files view issue
+
+
