@@ -25,4 +25,31 @@ Implimenting Appraisal Hike Matrix screen
 - code changes in announcememt screen for right click save as option disabled
 - code changes in messageboard screen for ms-excel files and doc files view issue
 
-
+-------23/08/2023-------------
+working on appraisal hike matrix screen regarding adding dynamic fields issue  and  grid saving issue
+issue fixed regarding appraisal hike matrix screen grid selection 
+issue fixed on cancel button removal and grid delete issue in appraisal  hike matrix screen
+added tooltip to login page fields of create company, restore company and refresh companylist
+working on appraisal hike matrix screen header fields display issue 
+unit testing on CTCmatrixs screen data posting issue from controller side
+implimentation of employee revision fields new screen in systems > data management > employee revision fields
+code changes in employee revision field and commited the employee revision field screen
+code changes in CTC Matrix settings screen of UI implimentation 
+working on document view issue for excel sheet
+issue fixed on employee master and expense claim excel file view issue ( OLEDB  error)
+working on CTC matrix screen to impliment settings dropdown fields to add in ctc matrix main screen
+issue resolved in Shift & Attendance>Shift Plan 1.while adding more than 5 legs, the grid is merging under shift patterns
+unit testing on issue annivarsary and birthday announcement alerts are showing for resigned and terminated employees 
+implimentation CTC matrix settings screen of tag data details and pay components data table is added 
+unit testing on adding pay componets fields but value is not showing in dropdown  
+code changes in transcaction controller issue for import excel file when view file 
+unit testing on restore company from hcm x  and restore company via login page screen issue 
+fixed grid delete button is not working issue in appraisal hike matrix main screen 
+working on CTC matrix settings screen implimentation
+working on CTC matrix settings screen implimentation
+implimenting jobopenings through external URL screen 
+adding external jobopenings portal screen UI developed 
+created jobopenings external controller for vue
+code changes in jobopenings model and jobopeningsds files 
+working on external jobopenings list screen 
+unit testing on restore company from hcm x  and restore company via login page screen issue (not resolved and not working in hcm  also) 
