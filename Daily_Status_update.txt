@@ -80,3 +80,10 @@ working on roster screen
 issue fixed in attendance remarks screen for autocomplete undefined issue while loading empty in hcm-x
 issue fixed in date of joining  field date is showing 05/08/1899 instead of current date in recruitment > job openings>date of joining field
 working on organization chart screen allinment issue and fields displaying in wrong format issue
+
+
+
+
+
+
+
