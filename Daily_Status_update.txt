@@ -53,3 +53,30 @@ created jobopenings external controller for vue
 code changes in jobopenings model and jobopeningsds files 
 working on external jobopenings list screen 
 unit testing on restore company from hcm x  and restore company via login page screen issue (not resolved and not working in hcm  also) 
+
+-----25/09/2023---------
+
+working on CTC matrix screen implimentation
+working on CTC matrix main screen implimentation and mapping fields of CTC matrix settings
+"unit testing on Evaluation>>under date of joining and Expected date of joining it's showing current date ,
+ if we remove current date then it's showing date as 30/11/1899 instead of showing dd/mm/yyyy"
+working on CTC matrix screen data posting in hcm-x
+code changes in  CTC matrix vue file for fields selection issue 
+code changes in attendance remark screen of UI design and implimentation
+code changes in attendance remark controlller for rendering data to vue 
+working on attendance remarks sceen for UI changes
+working on data saving issue from hcm -x , checking data is not saving properly issue
+working on CTC matrix screen getting issue while posting data from hcm-x
+issue fixed in CTC matrix screen posting and implimented CTC matrix screen in hcm-x
+code changes in leave planner screen for data retriving issue 
+code changes in attendance remark screen for data retriving 
+UI changes in attendance remarks screen and trying to load data using date and employees 
+code changes in attendance remarks screen for adding  datatable fields 
+unit testing on payroll >> attendance remarks screen >> how data is loading in datatable using payfrequency period data 
+code changes in attedance remarks controller for data retriving and posting 
+"basha: below screen is not there in HCMX Its for all customers Global .. for all clients :
+Please add the missing screen from HCM to HCMX Attendance remark -- closed"
+working on roster screen 
+issue fixed in attendance remarks screen for autocomplete undefined issue while loading empty in hcm-x
+issue fixed in date of joining  field date is showing 05/08/1899 instead of current date in recruitment > job openings>date of joining field
+working on organization chart screen allinment issue and fields displaying in wrong format issue
