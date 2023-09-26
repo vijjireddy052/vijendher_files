@@ -81,6 +81,18 @@ issue fixed in attendance remarks screen for autocomplete undefined issue while 
 issue fixed in date of joining  field date is showing 05/08/1899 instead of current date in recruitment > job openings>date of joining field
 working on organization chart screen allinment issue and fields displaying in wrong format issue
 
+code changes in leave condition template screen for data retriving issue fixed
+code changes in attendance remarks screen for field  undefined issue  
+code changes in  training request & initiate training screens for adding accordion( UI changes )
+unit testing on rights issue fixed  > while HR login , try to deleting the records getting error like "Can not delete record, due to Insufficient Rights " 
+code changes in training exam result & initiate training exam screens UI  changes 
+working on organization chart screen allinment issue and fields displaying in wrong format issue
+code changes in leave planner grid value is not saving issue 
+issue fixed  > while selecting type of action(disciplanary action) in advance filter values are not loading in workflow screen
+code changes in training schedule screen for missing information
+code changes in email template screen for field not able to null in dropdown issue fixed
+
+
 
 
 
