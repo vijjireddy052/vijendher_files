@@ -80,7 +80,6 @@ working on roster screen
 issue fixed in attendance remarks screen for autocomplete undefined issue while loading empty in hcm-x
 issue fixed in date of joining  field date is showing 05/08/1899 instead of current date in recruitment > job openings>date of joining field
 working on organization chart screen allinment issue and fields displaying in wrong format issue
-
 code changes in leave condition template screen for data retriving issue fixed
 code changes in attendance remarks screen for field  undefined issue  
 code changes in  training request & initiate training screens for adding accordion( UI changes )
@@ -92,7 +91,29 @@ issue fixed  > while selecting type of action(disciplanary action) in advance fi
 code changes in training schedule screen for missing information
 code changes in email template screen for field not able to null in dropdown issue fixed
 
-
+-----31/10/2023---------
+initiate training feedback screen ui issue resolved  
+issue fixed >> Ess hr login  > time card list view blanck screen issue 
+implimenting roster calendar screen in hcm-x  
+code changes in roster calendar and rosterservice files for roster calendar screen
+issue fixed in company restore issue backup is formed incorrectly and abnormally backup became empty  
+save successfully spelling mistake issue in jobdescriptionviewm,roundsev,budgetdefineev,employeetaxdeckaration screens
+code changes in employee location screen for current date is not loading for new record and removed * marks for remarks & revisiondate fields
+removing calcel button in HCM-X >> attendance regularizatioin, device registration, employee team, geofencing screens
+I18N language changes in employee geo location screen
+removing cancel button in HCM -X >> globalpreference alerts , swipe card
+code changes in employee location screen for current date is not loading for new record and removed * marks for remarks & revisiondate fields
+code changes in ffilter for leave application save issue for  filter search
+code changes in employee team for current date and loadbutton added
+code changes in initiate online training screen UI changes
+issue fixed in employee team screen for 500 error while opening new record
+unit testing on leave application approve issue while approving leave application through mail Remarks,approved by and aooroved on fields are missing
+code changes in employeecardexplorer.vue file for employee master >> list view refresh issue while deleting record 
+unit testing on shift & attendance >> employee geo location screen  revision date and remarks fields display issue fixed 
+code changes in shift & attendance  >> employee geolocation file to fix issue of fields display issue
+code changes in preference controller and backupmodel files for ( back button & cancel button is not working in specific sub menus in datamanagement module
+code changes in Roster_DetailsRepository.cs file to get lstparms value getting null 
+code changes in calendarviewcontroller.cs file and rostercalender.vue  for getting shifts show in calendar
 
 
 
